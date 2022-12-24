@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/category_tosong"
+    app:startDestination="@id/meFragment">
+    <fragment
+        android:id="@+id/meFragment"
+        android:name="com.tutuit.a1.ui.Fragment.MeFragment"
+        android:label="MeFragment" >
+        <action
+            android:id="@+id/action_meFragment_to_songListFragment"
+            app:destination="@id/songListFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/songListFragment"
+        android:name="com.tutuit.a1.ui.Fragment.CategorySongList.SongListFragment"
+        android:label="fragment_song_list"
+        tools:layout="@layout/fragment_song_list" />
+</navigation>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/me"
+            android:icon="@drawable/me"
+            android:title="@string/main_me" />
+        <item
+            android:id="@+id/find"
+            android:icon="@drawable/found"
+            android:title="@string/main_find"/>
+        <item
+            android:id="@+id/podcast"
+            android:icon="@drawable/podcast"
+            android:title="@string/me_podcast"/>
+        <item
+            android:id="@+id/attention"
+            android:icon="@drawable/attention"
+            android:title="@string/main_attention"/>
+        <item
+            android:id="@+id/CloudVillage"
+            android:icon="@drawable/country"
+            android:title="@string/main_CloudVillage"/>
+
+    </group>
+
+</menu>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="online"
+            type="com.tutuit.a1.data.viewModel.OnLineMusicViewModel" />
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:text="@string/songListCategory"
+            android:textSize="15sp"
+            app:layout_constraintBottom_toBottomOf="@id/online_Spinner"
+            app:layout_constraintEnd_toStartOf="@id/online_Spinner"
+            app:layout_constraintTop_toTopOf="@id/online_Spinner" />
+
+        <androidx.appcompat.widget.AppCompatSpinner
+            android:id="@+id/online_Spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/onlineRV"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/online_Spinner" />
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/online_progress"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:indeterminate="true"
+            android:visibility="visible"
+            android:layout_marginTop="100dp"
+            app:hideAnimationBehavior="inward"
+            app:indicatorColor="@color/teal_200"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

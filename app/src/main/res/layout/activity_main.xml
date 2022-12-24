@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <data>
+    </data>
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:background="#EC4141"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.bottomnavigation.BottomNavigationView
+                android:id="@+id/main_buttomNav"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:backgroundTint="#ffffff"
+                app:itemIconTint="@drawable/buttomnav_item"
+                app:itemTextColor="@drawable/main_footbutton"
+                app:labelVisibilityMode="labeled"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:menu="@menu/bottom_main_menu" />
+            <androidx.viewpager.widget.ViewPager
+                android:id="@+id/fragment_vp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="60dp"
+                app:layout_constraintBottom_toTopOf="@id/main_buttomNav"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/toolbar" />
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/main_bottom"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:background="#ffffff"
+                android:visibility="invisible"
+                app:layout_constraintBottom_toTopOf="@+id/main_buttomNav"
+                app:layout_constraintStart_toStartOf="parent">
+                <ImageView
+                    android:id="@+id/bottom_sheet_imageView"
+                    android:layout_width="35dp"
+                    android:layout_height="35dp"
+                    android:src="@drawable/music"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginBottom="7dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/bottom_sheet_name"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginStart="8dp"
+                    android:text="歌名"
+                    android:maxLines="1"
+                    android:textSize="15sp"
+                    app:layout_constraintEnd_toStartOf="@+id/bottom_sheet_stopPlay"
+                    app:layout_constraintStart_toEndOf="@+id/bottom_sheet_imageView"
+                    app:layout_constraintTop_toTopOf="@id/bottom_sheet_imageView" />
+
+                <TextView
+                    android:id="@+id/bottom_sheet_singer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:textSize="12sp"
+                    android:text="歌手"
+                    app:layout_constraintStart_toEndOf="@id/bottom_sheet_imageView"
+                    app:layout_constraintTop_toBottomOf="@id/bottom_sheet_name" />
+                <ImageButton
+                    android:id="@+id/bottom_sheet_playList"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:src="@drawable/ic_baseline_format_list_bulleted_24"
+                    android:layout_marginEnd="@dimen/dp_10"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"/>
+                <ImageButton
+                    android:id="@+id/bottom_sheet_nextPlay"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:src="@drawable/ic_baseline_skip_next_24"
+                    android:layout_marginEnd="@dimen/dp_10"
+                    app:layout_constraintEnd_toStartOf="@+id/bottom_sheet_playList"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"/>
+
+                <androidx.appcompat.widget.AppCompatToggleButton
+                    android:id="@+id/bottom_sheet_stopPlay"
+                    android:layout_width="25dp"
+                    android:layout_height="25dp"
+                    android:textOn=""
+                    android:textOff=""
+                    android:background="@drawable/play_state"
+                    android:backgroundTint="@null"
+                    android:layout_marginEnd="@dimen/dp_10"
+                    app:layout_constraintEnd_toStartOf="@+id/bottom_sheet_nextPlay"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"/>
+
+                <com.google.android.material.progressindicator.LinearProgressIndicator
+                    android:id="@+id/bottom_sheet_progress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:trackThickness="3dp"
+                    app:trackColor="@color/teal_200"
+                    android:indeterminate="false"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/bottom_sheet"
+            app:behavior_hideable="true"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/white"
+            app:layout_behavior="@string/bottom_sheet_behavior">
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="24dp">
+
+                <TextView
+                    android:id="@+id/bottom_sheet1_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="歌曲:"
+                    android:textSize="20sp"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"/>
+                <TextView
+                    android:id="@+id/bottom_sheet1_singer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/sp_14"
+                    android:text="歌手"
+                    app:layout_constraintTop_toBottomOf="@+id/bottom_sheet1_name"
+                    app:layout_constraintStart_toStartOf="@+id/bottom_sheet1_name"/>
+                <androidx.core.widget.NestedScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:layout_constraintTop_toBottomOf="@+id/bottom_sheet1_singer"
+                    app:layout_constraintStart_toStartOf="parent">
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/bottom_sheet1_nextMusic"
+                            android:theme="@style/Theme.MaterialComponents.Light.NoActionBar"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            app:icon="@drawable/nextmusic"
+                            android:textColor="@color/black"
+                            app:iconTint="@null"
+                            android:backgroundTint="@color/white"
+                            android:text="下一首播放"
+                            android:gravity="start"
+                            app:iconGravity="start"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintStart_toStartOf="parent"/>
+                        <com.google.android.material.button.MaterialButton
+                            android:theme="@style/Theme.MaterialComponents.Light.NoActionBar"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:backgroundTint="@color/white"
+                            android:textColor="@color/black"
+                            android:gravity="start"
+                            android:text="收藏进歌单"
+                            app:iconTint="@null"
+                            app:icon="@drawable/musiclist"
+                            app:layout_constraintTop_toBottomOf="@+id/bottom_sheet1_nextMusic"
+                            app:layout_constraintStart_toStartOf="parent"/>
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </androidx.core.widget.NestedScrollView>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.core.widget.NestedScrollView>
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+</layout>
+
