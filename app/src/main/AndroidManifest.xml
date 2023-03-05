@@ -8,9 +8,10 @@
     <application
         android:name=".ui.Utility.MyApplication"
         android:allowBackup="true"
-        android:icon="@drawable/musicicon"
-        android:label=""
-        android:roundIcon="@drawable/musicicon"
+        android:icon="@drawable/icon"
+        android:label="简易网易云"
+        android:roundIcon="@drawable/icon"
+        android:networkSecurityConfig="@xml/http"
         android:supportsRtl="true"
         android:theme="@style/Theme.网抑云音乐1">
         <activity
@@ -44,7 +45,6 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>

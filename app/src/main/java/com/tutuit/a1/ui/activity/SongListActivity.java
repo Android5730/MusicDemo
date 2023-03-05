@@ -1,19 +1,18 @@
 package com.tutuit.a1.ui.activity;
 
 import android.content.Intent;
+import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
-
 import com.bumptech.glide.Glide;
 import com.chad.library.adapter.base.BaseQuickAdapter;
 import com.chad.library.adapter.base.listener.OnItemChildClickListener;
@@ -21,6 +20,8 @@ import com.chad.library.adapter.base.listener.OnItemClickListener;
 import com.tutuit.a1.R;
 import com.tutuit.a1.data.bean.SongCategoryBean;
 import com.tutuit.a1.data.bean.SongListBean;
+import com.tutuit.a1.data.bean.bean;
+import com.tutuit.a1.data.network.Constant;
 import com.tutuit.a1.data.viewModel.SongListViewModel;
 import com.tutuit.a1.databinding.ActivitySongListBinding;
 import com.tutuit.a1.ui.Adapter.SongListAdapter;
@@ -40,7 +41,7 @@ public class SongListActivity extends AppCompatActivity {
         binding = DataBindingUtil.setContentView(this,R.layout.activity_song_list);
         viewModel = new ViewModelProvider(this,new ViewModelProvider.AndroidViewModelFactory(this.getApplication())).get(SongListViewModel.class);
         initView();
-     //   initTouch();
+
     }
 
     private void initTouch() {
@@ -61,9 +62,11 @@ public class SongListActivity extends AppCompatActivity {
             @Override
             public void onItemClick(@NonNull BaseQuickAdapter<?, ?> adapter, @NonNull View view, int position) {
                 Intent intent = new Intent(SongListActivity.this, SongPlayService.class);
+                Log.d("TAG", "onItemClick: 点击");
                 intent.putExtra("list", (Serializable) viewModel.getSongList().getValue().getSongs());
                 intent.putExtra("position",""+position);
                 intent.putExtra("button","start");
+                intent.putExtra("type", String.valueOf(Constant.TYPE_LINE));
                 startService(intent);
             }
         });
@@ -71,6 +74,7 @@ public class SongListActivity extends AppCompatActivity {
 
     private void initView() {
         SongCategoryBean.PlaylistsBean songBean = (SongCategoryBean.PlaylistsBean) getIntent().getSerializableExtra("SongBean");
+
         // 歌单
         viewModel.setId(songBean.getId());
         // 为MaterialButton--歌单作者头像 设置图片
@@ -86,6 +90,7 @@ public class SongListActivity extends AppCompatActivity {
                 });
             }
         }).start();
+        binding.categoryName.setText(songBean.getName());
         // 歌单作者名称
         binding.creatorButton.setText(songBean.getCreator().getNickname());
         // 歌单图片
@@ -93,18 +98,32 @@ public class SongListActivity extends AppCompatActivity {
                 .load(songBean.getCoverImgUrl()).into(binding.categoryImage);
         // 设置歌单详情
         binding.categoryDescription.setText(songBean.getDescription());
-        //
+        // 设置布局
         binding.listRv.setLayoutManager(new LinearLayoutManager(this));
+        // 监听歌曲
         viewModel.getSongList().observe(this, new Observer<SongListBean>() {
             @Override
             public void onChanged(SongListBean songListBean) {
                 if(songListBean!=null){
                     adapter = new SongListAdapter(songListBean.getSongs());
                     binding.listRv.setAdapter(adapter);
+                    binding.progress.setVisibility(View.GONE);
+                    initTouch();
+                    Log.d("歌曲", "onChanged: "+songListBean.getSongs().get(0).getName());
                 }
             }
         });
-
+/*        viewModel.getSongList1().observe(this, new Observer<bean>() {
+            @Override
+            public void onChanged(bean bean) {
+                if (bean!=null){
+                    adapter = new SongListAdapter(bean.getPlaylist().getTracks());
+                    binding.listRv.setAdapter(adapter);
+                    binding.progress.setVisibility(View.GONE);
+                    Log.d("歌曲", "onChanged: "+bean.getPlaylist().getTracks().get(0).getAl().getName());
+                }
+            }
+        });*/
     }
     private Drawable loadImageFromNetwork(String imageUrl) {
         Drawable drawable = null;

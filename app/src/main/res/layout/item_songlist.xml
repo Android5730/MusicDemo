@@ -5,6 +5,15 @@
     android:layout_height="wrap_content"
     android:layout_margin="8dp">
 
+
+    <ImageView
+        android:id="@+id/song_imageView"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@drawable/roung"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
     <TextView
         android:id="@+id/songList_name"
         android:layout_width="0dp"
@@ -16,7 +25,7 @@
         android:textStyle="bold"
         android:textColor="@color/black"
         app:layout_constraintEnd_toStartOf="@+id/songList_like"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/song_imageView"
         app:layout_constraintTop_toTopOf="parent" />
     <TextView
         android:id="@+id/songList_singer"
@@ -26,7 +35,7 @@
         android:textSize="12sp"
         android:text="BO Peep"
         app:layout_constraintTop_toBottomOf="@id/songList_name"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintStart_toEndOf="@+id/song_imageView" />
     <ImageView
         android:id="@+id/songList_moveInformation"
         android:layout_width="wrap_content"

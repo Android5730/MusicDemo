@@ -1,10 +1,19 @@
 package com.tutuit.a1.ui.Fragment;
 
+import static android.content.Context.NOTIFICATION_SERVICE;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +23,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
+import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
@@ -30,6 +40,7 @@ import com.tutuit.a1.ui.Adapter.LocalMusicAdapter;
 import com.tutuit.a1.ui.Service.SongPlayService;
 import com.tutuit.a1.data.bean.LocalMusicBean;
 import com.tutuit.a1.databinding.FragmentLocalBinding;
+import com.tutuit.a1.ui.activity.MainActivity;
 
 import java.io.Serializable;
 import java.util.List;
@@ -56,11 +67,32 @@ public class LocalmusicFragment extends Fragment implements View.OnClickListener
         adapter.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(@NonNull BaseQuickAdapter<?, ?> adapter, @NonNull View view, int position) {
+                Intent intent1 = new Intent(getActivity(), MainActivity.class);
+                PendingIntent pi = PendingIntent.getActivity(getContext(),0,intent1,0);
+                // 开启通知
+                NotificationManager manager = (NotificationManager) getActivity().getSystemService(NOTIFICATION_SERVICE);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    NotificationChannel notificationChannel = new NotificationChannel("AppTestNotificationId", "AppTestNotificationName", NotificationManager.IMPORTANCE_DEFAULT);
+                    manager.createNotificationChannel(notificationChannel);
+                    // 参数:上下文环境;构造的通知将被发布到这个NotificationChannel上
+                    Notification notification = new NotificationCompat.Builder(getContext(),"播放音乐")
+                            .setContentTitle(viewModel.getMusicBeans().get(position).getName())
+                            .setContentText(viewModel.getMusicBeans().get(position).getSinger())
+                            .setWhen(System.currentTimeMillis()) //事件发生的时间 （currentTimeMillis()毫秒；nanoTime()纳秒）
+                            // 设置通知中显示的小图标。只能用纯alpha图层的图片进行设置
+                            .setSmallIcon(R.drawable.music)
+                            .setContentIntent(pi)
+                            // 设置通知中显示的大图标。
+                            .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.music))
+                            .setChannelId("AppTestNotificationId")
+                            .build();
+                    manager.notify(1,notification);
+                }
                 Intent intent = new Intent(getActivity(), SongPlayService.class);
                 intent.putExtra("list", (Serializable) viewModel.getMusicBeans());
                 intent.putExtra("position",""+position);
                 intent.putExtra("button","start");
-                intent.putExtra("type",Constant.TYPE_LOCAL);
+                intent.putExtra("type",String.valueOf(Constant.TYPE_LOCAL));
                 intent.putExtra("time",String.valueOf(viewModel.getMusicBeans().get(position).getDuration()));
                 getActivity().startService(intent);
                 Toast.makeText(getActivity(),""+viewModel.getMusicBeans().get(position).getUrl(),Toast.LENGTH_SHORT).show();
@@ -146,4 +178,5 @@ public class LocalmusicFragment extends Fragment implements View.OnClickListener
         switch (v.getId()){
         }
     }
+
 }

@@ -1,6 +1,7 @@
 package com.tutuit.a1.data.viewModel;
 
 import android.app.Application;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.AndroidViewModel;
@@ -33,6 +34,7 @@ public class BaseViewModel<T> extends AndroidViewModel {
                 @Override
                 public void onResponse(@NonNull Call<T> call, @NonNull Response<T> response) {
                     bean.postValue(response.body());
+                    Log.d("TAG", "onResponse: "+response.body().toString());
                 }
                 @Override
                 public void onFailure(@NonNull Call<T> call, @NonNull Throwable t) {
@@ -40,6 +42,4 @@ public class BaseViewModel<T> extends AndroidViewModel {
             });
         }
     }
-
-
 }

@@ -4,9 +4,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.textclassifier.TextLinks;
 import android.widget.AdapterView;
 import android.widget.SimpleAdapter;
 import android.widget.Toast;
@@ -16,6 +18,7 @@ import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
 import androidx.recyclerview.widget.GridLayoutManager;
 
 import com.chad.library.adapter.base.BaseQuickAdapter;
@@ -35,6 +38,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import okhttp3.Request;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -82,24 +86,20 @@ public class OnlineMusicFragment extends Fragment {
      * 功能：获取歌单分类标签
      */
     private void initGetLabel() {
-        new Thread(new Runnable() {
+        Call<ChoicenessBean> call = apiService.choicenessSongList();
+        call.enqueue(new Callback<ChoicenessBean>() {
             @Override
-            public void run() {
-                Call<ChoicenessBean> call = apiService.choicenessSongList();
-                call.enqueue(new Callback<ChoicenessBean>() {
-                    @Override
-                    public void onResponse(@NonNull Call<ChoicenessBean> call, @NonNull Response<ChoicenessBean> response) {
-                        choicenessBean = response.body();
-                        Message message = new Message();
-                        message.what = 1;
-                        handler.sendMessage(message);
-                    }
-                    @Override
-                    public void onFailure(@NonNull Call<ChoicenessBean> call, @NonNull Throwable t) {
-                    }
-                });
+            public void onResponse(@NonNull Call<ChoicenessBean> call, @NonNull Response<ChoicenessBean> response) {
+                choicenessBean = response.body();
+                Message message = new Message();
+                message.what = 1;
+                handler.sendMessage(message);
             }
-        }).start();
+            @Override
+            public void onFailure(@NonNull Call<ChoicenessBean> call, @NonNull Throwable t) {
+            }
+        });
+
 
     }
     // 异步线程返回更新UI
@@ -134,7 +134,9 @@ public class OnlineMusicFragment extends Fragment {
                     adapter = new OnLineSoneCategoryAdapter(songCategoryBean.getPlaylists());
                     binding.onlineRV.setLayoutManager(new GridLayoutManager(getActivity(),3));
                     binding.onlineRV.setAdapter(adapter);
+                    Log.d("TAG", "handleMessage: 加载完成");
                     iniTouch();
+                    binding.progress.setVisibility(View.GONE);
                     break;
             }
             return false;
@@ -161,13 +163,12 @@ public class OnlineMusicFragment extends Fragment {
         /**
          * 功能：获取分类歌单内容
          */
-
-        apiService = retrofit.create(APIService.class);
         Call<SongCategoryBean> songCategory = apiService.getSongCategory(category,50);
         songCategory.enqueue(new Callback<SongCategoryBean>() {
             @Override
             public void onResponse(Call<SongCategoryBean> call, Response<SongCategoryBean> response) {
                 songCategoryBean = response.body();
+                Log.d("TAG", "onResponse: "+songCategoryBean.toString());
                 Message message = new Message();
                 message.what = 3;
                 handler.sendMessage(message);

@@ -130,6 +130,10 @@ public class SongListBean implements Serializable {
             return id;
         }
 
+        public AlBean getAl() {
+            return al;
+        }
+
         public static class AlBean implements Serializable {
             /**
              * id : 34754096
@@ -144,6 +148,10 @@ public class SongListBean implements Serializable {
             private String picUrl;
             private long pic;
             private List<?> tns;
+
+            public long getPic() {
+                return pic;
+            }
         }
 
         public static class HBean implements Serializable {

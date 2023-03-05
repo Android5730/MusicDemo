@@ -13,11 +13,12 @@
         app:layout_constraintStart_toStartOf="parent"/>
     <TextView
         android:id="@+id/online_rv_content"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textSize="15dp"
         android:text="1213123"
         app:layout_constraintTop_toBottomOf="@id/online_rv_imageView"
+        app:layout_constraintEnd_toEndOf="@+id/online_rv_imageView"
         app:layout_constraintStart_toStartOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

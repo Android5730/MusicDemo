@@ -1,9 +1,13 @@
 package com.tutuit.a1.ui.activity;
 
+import android.app.NotificationManager;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Message;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -11,30 +15,46 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.widget.Toolbar;
 import androidx.databinding.DataBindingUtil;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.ViewPager;
 
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.tutuit.a1.R;
+import com.tutuit.a1.data.bean.LocalMusicBean;
+import com.tutuit.a1.data.network.Constant;
+import com.tutuit.a1.databinding.ActivityMainBinding;
+import com.tutuit.a1.ui.Adapter.LocalMusicAdapter;
 import com.tutuit.a1.ui.Adapter.MainFragmentPagerAdapter;
+import com.tutuit.a1.ui.Fragment.LocalmusicFragment;
 import com.tutuit.a1.ui.Receiver.BottomSheetClickReceiver;
+import com.tutuit.a1.ui.Receiver.SongListReceiver;
 import com.tutuit.a1.ui.Receiver.SongPlayReceiver;
 import com.tutuit.a1.ui.Service.SongPlayService;
-import com.tutuit.a1.databinding.ActivityMainBinding;
 
-public class MainActivity extends BaseActivity {
+import java.io.Serializable;
+import java.util.List;
+
+public class MainActivity extends BaseActivity{
     // 地步导航栏的选项
     private MenuItem menuItem;
     private static ActivityMainBinding binding;
     private SongPlayReceiver receiver;
-
+    private SongListReceiver songListReceiver;
+    private LocalBroadcastManager  manager;
     private BottomSheetBehavior bottomSheetBehavior;
+    private BottomSheetDialog dialog;
 
 
     public static Handler handler = new Handler(new Handler.Callback() {
@@ -49,13 +69,14 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this,R.layout.activity_main);
         binding.setLifecycleOwner(this);
-        Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        MaterialToolbar toolbar = findViewById(R.id.toolbar);
+
+/*        setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         if(actionBar !=null){
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeAsUpIndicator(R.drawable.ic_baseline_menu_24);
-        }
+        }*/
         initViews();
         initBottomListener(); // 底部导航栏点击事件和滑动绑定
     }
@@ -110,6 +131,7 @@ public class MainActivity extends BaseActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, SongPlayService.class);
                 intent.putExtra("button","stop");
+                intent.putExtra("type",String.valueOf(Constant.TYPE_LOCAL));
                 startService(intent);
             }
         });
@@ -120,13 +142,18 @@ public class MainActivity extends BaseActivity {
                 Intent intent = new Intent(MainActivity.this, SongPlayService.class);
                 intent.putExtra("button","next");
                 intent.putExtra("position","1");
+                intent.putExtra("type",String.valueOf(Constant.TYPE_LOCAL));
                 startService(intent);
+
             }
         });
         // 播放列表点击
         binding.bottomSheetPlayList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+    /*            Intent intent = new Intent("TO Get SongList");
+                // 发送本地广播
+                manager.sendBroadcast(intent);*/
 
             }
         });
@@ -164,6 +191,7 @@ public class MainActivity extends BaseActivity {
             }
         });
         binding.fragmentVp.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
             }
@@ -193,9 +221,32 @@ public class MainActivity extends BaseActivity {
      */
     public void setBottomSheetState(String name,String singer){
         // 设置折叠
-        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-        binding.bottomSheet1Name.setText("歌手："+name);
-        binding.bottomSheet1Singer.setText(singer);
+     //   bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+        dialog = new BottomSheetDialog(this);
+        View view = getLayoutInflater().inflate(R.layout.dialog_bottomsheet,null);
+        TextView bottomSheet1Name = (TextView) view.findViewById(R.id.bottom_sheet1_name);
+        TextView bottomSheet1Singer = (TextView) view.findViewById(R.id.bottom_sheet1_singer);
+        dialog.setContentView(view);
+        dialog.show();
+        bottomSheet1Name.setText("歌手："+name);
+        bottomSheet1Singer.setText(singer);
+    }
+
+    /**
+     * 获取歌曲集合
+     * @param songList
+     */
+    public void setBottomSheetSongList(List<LocalMusicBean> songList){
+        BottomSheetDialog dialog = new BottomSheetDialog(this);
+        View view = getLayoutInflater().inflate(R.layout.dialog_bs_songlist,null);
+        RecyclerView recyclerView =(RecyclerView) view.findViewById(R.id.bs_rv);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(new LocalMusicAdapter(songList));
+        dialog.setContentView(view);
+     //   new Gson().get
+        dialog.show();
+
+
     }
     /**
      * 为viewPager设置适配器
@@ -203,12 +254,23 @@ public class MainActivity extends BaseActivity {
      */
     private void initViews() {
         MainFragmentPagerAdapter adapter = new MainFragmentPagerAdapter(getSupportFragmentManager(), 0);
-       binding.fragmentVp.setAdapter(adapter);
-       binding.fragmentVp.setOffscreenPageLimit(4);
-       // 获取bottomSheet
+        binding.fragmentVp.setAdapter(adapter);
+        binding.fragmentVp.setOffscreenPageLimit(4);
+        // 注册本地广播管理器
+        manager = LocalBroadcastManager.getInstance(this);
+        // 注册筛选器
+        IntentFilter intentFilter = new IntentFilter();
+        // 筛选动作
+        intentFilter.addAction("TO Get SongList");
+        // new广播对象
+        songListReceiver = new SongListReceiver();
+        // 注册本地广播
+        manager.registerReceiver(songListReceiver,intentFilter);
+
+/*       // 获取bottomSheet
         bottomSheetBehavior= BottomSheetBehavior.from(binding.bottomSheet);
         // 设置初始状态为隐藏
-        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);*/
     }
 
     @Override
@@ -228,5 +290,11 @@ public class MainActivity extends BaseActivity {
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onDestroy() {
+        manager.unregisterReceiver(songListReceiver);
+        super.onDestroy();
     }
 }
